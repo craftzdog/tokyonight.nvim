@@ -3,10 +3,10 @@ local M = {
   colorscheme = "solarized-osaka",
   opts = { plugins = { all = true } },
   globals = { vim = vim },
-  cache = {},
 }
 
 function M.reset()
+  -- require("solarized-osaka.util").cache.clear()
   local colors = require("solarized-osaka.colors").setup()
   M.globals.colors = colors
   M.globals.c = colors
@@ -67,17 +67,13 @@ return {
           group = function(buf, match)
             local group = M.hl_group(match, buf)
             if group then
-              if M.cache[group] == nil then
-                M.cache[group] = false
-                local hl = vim.api.nvim_get_hl(0, { name = group, link = false, create = false })
-                if not vim.tbl_isempty(hl) then
-                  hl.fg = hl.fg or vim.api.nvim_get_hl(0, { name = "Normal", link = false }).fg
-                  M.cache[group] = true
-                  vim.api.nvim_set_hl(0, group .. "Dev", hl)
-                end
+              local hl = vim.api.nvim_get_hl(0, { name = group, link = false, create = false })
+              if not vim.tbl_isempty(hl) then
+                hl.fg = hl.fg or vim.api.nvim_get_hl(0, { name = "Normal", link = false }).fg
+                vim.api.nvim_set_hl(0, group .. "Dev", hl)
               end
-              return M.cache[group] and group .. "Dev" or nil
             end
+            return group .. "Dev"
           end,
           extmark_opts = { priority = 2000 },
         },
